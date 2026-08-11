@@ -450,7 +450,14 @@
       </div>
 
       <div>
-        <form id="appointmentForm">
+        <iframe name="bookingTarget" id="bookingTarget" style="display:none"></iframe>
+        <form id="appointmentForm"
+              action="https://formsubmit.co/masiha4080@gmail.com"
+              method="POST"
+              target="bookingTarget">
+          <input type="hidden" name="_subject" value="New Hair Salon Appointment">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_template" value="table">
           <div>
             <label for="name">Full name</label>
             <input id="name" name="name" required placeholder="Your name">
@@ -526,9 +533,8 @@
   });
 
   form.addEventListener("submit", function(e) {
-    e.preventDefault();
-
     if (!timeInput.value) {
+      e.preventDefault();
       alert("Please choose an available appointment time.");
       return;
     }
@@ -539,11 +545,14 @@
     const date = dateInput.value;
     const time = timeInput.value;
 
-    confirmation.style.display = "block";
-    confirmation.textContent =
-      `Appointment requested for ${name}: ${service}, ${date} at ${time}, with ${stylist}.`;
-
-    form.scrollIntoView({ behavior: "smooth", block: "center" });
+    // The form is submitted to FormSubmit in the hidden iframe.
+    // FormSubmit forwards the booking details to the salon owner's email.
+    setTimeout(() => {
+      confirmation.style.display = "block";
+      confirmation.textContent =
+        `Appointment request sent for ${name}: ${service}, ${date} at ${time}, with ${stylist}.`;
+      form.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 400);
   });
 </script>
 
