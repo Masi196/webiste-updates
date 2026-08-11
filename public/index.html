@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luxe Hair Studio</title>
+  <style>
+    :root{
+      --bg:#fffaf7;
+      --card:#ffffff;
+      --text:#1f1b1a;
+      --muted:#6f6460;
+      --accent:#b76e79;
+      --accent-dark:#8f4f59;
+      --line:#eaded8;
+      --success:#2f7d5b;
+      --shadow:0 18px 40px rgba(64,39,32,.10);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.6;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(255,250,247,.95);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .nav{
+      max-width:1120px;
+      margin:auto;
+      padding:16px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .logo{
+      font-size:1.35rem;
+      font-weight:800;
+      letter-spacing:.3px;
+    }
+
+    .nav-links{
+      display:flex;
+      gap:22px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .nav-links a{
+      color:var(--text);
+      text-decoration:none;
+      font-weight:600;
+      font-size:.95rem;
+    }
+
+    .btn{
+      display:inline-block;
+      border:none;
+      cursor:pointer;
+      background:var(--accent);
+      color:white;
+      padding:13px 20px;
+      border-radius:999px;
+      font-weight:700;
+      text-decoration:none;
+      transition:.2s ease;
+    }
+
+    .btn:hover{background:var(--accent-dark); transform:translateY(-1px)}
+
+    .hero{
+      max-width:1120px;
+      margin:auto;
+      padding:72px 24px 56px;
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:42px;
+      align-items:center;
+    }
+
+    .eyebrow{
+      color:var(--accent-dark);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:1.6px;
+      font-size:.8rem;
+    }
+
+    h1{
+      font-size:clamp(2.5rem, 6vw, 5rem);
+      line-height:1.02;
+      margin:12px 0 20px;
+    }
+
+    .hero p{
+      color:var(--muted);
+      max-width:620px;
+      font-size:1.08rem;
+    }
+
+    .hero-card{
+      background:linear-gradient(145deg,#f4ddd8,#eed0d8);
+      min-height:410px;
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:flex-end;
+      padding:28px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-card:before,
+    .hero-card:after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      background:rgba(255,255,255,.35);
+    }
+
+    .hero-card:before{width:230px;height:230px;top:-60px;right:-60px}
+    .hero-card:after{width:150px;height:150px;bottom:55px;left:-50px}
+
+    .hero-badge{
+      position:relative;
+      z-index:2;
+      background:white;
+      padding:18px;
+      border-radius:20px;
+      width:100%;
+      box-shadow:0 12px 30px rgba(64,39,32,.12);
+    }
+
+    section{
+      max-width:1120px;
+      margin:auto;
+      padding:64px 24px;
+    }
+
+    .section-title{
+      text-align:center;
+      margin-bottom:34px;
+    }
+
+    .section-title h2{
+      margin:6px 0 8px;
+      font-size:2.2rem;
+    }
+
+    .section-title p{color:var(--muted);margin:0 auto;max-width:650px}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:20px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:24px;
+      box-shadow:0 8px 22px rgba(64,39,32,.05);
+    }
+
+    .price{
+      color:var(--accent-dark);
+      font-size:1.25rem;
+      font-weight:800;
+      margin-top:12px;
+    }
+
+    .hours{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    .hours-list{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:24px;
+    }
+
+    .hours-row{
+      display:flex;
+      justify-content:space-between;
+      padding:11px 0;
+      border-bottom:1px solid var(--line);
+      gap:20px;
+    }
+
+    .hours-row:last-child{border-bottom:0}
+
+    .booking-wrap{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:30px;
+      box-shadow:var(--shadow);
+      display:grid;
+      grid-template-columns:.9fr 1.1fr;
+      gap:30px;
+    }
+
+    form{
+      display:grid;
+      gap:14px;
+    }
+
+    label{
+      font-weight:700;
+      font-size:.92rem;
+    }
+
+    input, select{
+      width:100%;
+      padding:13px 14px;
+      border:1px solid #d8cbc5;
+      border-radius:12px;
+      background:white;
+      font:inherit;
+      outline:none;
+    }
+
+    input:focus, select:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(183,110,121,.12);
+    }
+
+    .slots{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .slot{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:12px;
+      padding:11px 8px;
+      cursor:pointer;
+      font-weight:700;
+      transition:.15s ease;
+    }
+
+    .slot:hover{border-color:var(--accent)}
+    .slot.selected{background:var(--accent);color:white;border-color:var(--accent)}
+    .slot.unavailable{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+
+    .note{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    .confirmation{
+      display:none;
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:#e9f7ef;
+      color:var(--success);
+      font-weight:700;
+    }
+
+    footer{
+      text-align:center;
+      padding:34px 24px;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      margin-top:40px;
+    }
+
+    @media(max-width:850px){
+      .hero, .booking-wrap, .hours{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr 1fr}
+    }
+
+    @media(max-width:600px){
+      .nav{align-items:flex-start}
+      .nav-links{gap:12px;justify-content:flex-end}
+      .nav-links a:not(.btn){display:none}
+      .grid{grid-template-columns:1fr}
+      .slots{grid-template-columns:1fr 1fr}
+      .hero{padding-top:44px}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="logo">Luxe Hair Studio</div>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#stylists">Stylists</a>
+      <a href="#hours">Hours</a>
+      <a class="btn" href="#booking">Book Now</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Hair • Style • Confidence</div>
+      <h1>Fresh hair starts here.</h1>
+      <p>
+        Haircuts, styling, color, and grooming in a clean modern salon.
+        Check appointment availability and book your preferred time online.
+      </p>
+      <a class="btn" href="#booking">See Available Appointments</a>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-badge">
+        <strong>Appointments available today</strong>
+        <div class="note">Choose a service and time below to reserve your spot.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="section-title">
+      <div class="eyebrow">Services</div>
+      <h2>Popular salon services</h2>
+      <p>Simple pricing you can change anytime in the HTML file.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Men's Haircut</h3>
+        <p>Clean cut, fade, taper, or classic style with finishing.</p>
+        <div class="price">$30</div>
+      </div>
+      <div class="card">
+        <h3>Women's Haircut</h3>
+        <p>Consultation, haircut, blow-dry, and basic styling.</p>
+        <div class="price">$45</div>
+      </div>
+      <div class="card">
+        <h3>Hair Color</h3>
+        <p>Professional color service customized to your preferred look.</p>
+        <div class="price">$75+</div>
+      </div>
+      <div class="card">
+        <h3>Beard Trim</h3>
+        <p>Shape, line-up, trim, and clean finish.</p>
+        <div class="price">$18</div>
+      </div>
+      <div class="card">
+        <h3>Wash & Style</h3>
+        <p>Hair wash, blow-dry, and styling for a polished finish.</p>
+        <div class="price">$35</div>
+      </div>
+      <div class="card">
+        <h3>Kids Haircut</h3>
+        <p>Friendly haircut service for children 12 and under.</p>
+        <div class="price">$22</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stylists">
+    <div class="section-title">
+      <div class="eyebrow">Our Team</div>
+      <h2>Meet the stylists</h2>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Sophia</h3>
+        <p>Specializes in women's cuts, styling, and color.</p>
+      </div>
+      <div class="card">
+        <h3>Daniel</h3>
+        <p>Specializes in fades, men's cuts, and beard grooming.</p>
+      </div>
+      <div class="card">
+        <h3>Maya</h3>
+        <p>Specializes in color, highlights, and modern styles.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="hours">
+    <div class="section-title">
+      <div class="eyebrow">Visit Us</div>
+      <h2>Salon hours</h2>
+    </div>
+
+    <div class="hours">
+      <div>
+        <h3>Luxe Hair Studio</h3>
+        <p>123 Main Street<br>Chicago, IL 60601</p>
+        <p class="note">Phone: (312) 555-0199</p>
+      </div>
+
+      <div class="hours-list">
+        <div class="hours-row"><span>Monday</span><strong>10 AM – 7 PM</strong></div>
+        <div class="hours-row"><span>Tuesday</span><strong>10 AM – 7 PM</strong></div>
+        <div class="hours-row"><span>Wednesday</span><strong>10 AM – 7 PM</strong></div>
+        <div class="hours-row"><span>Thursday</span><strong>10 AM – 8 PM</strong></div>
+        <div class="hours-row"><span>Friday</span><strong>10 AM – 8 PM</strong></div>
+        <div class="hours-row"><span>Saturday</span><strong>9 AM – 6 PM</strong></div>
+        <div class="hours-row"><span>Sunday</span><strong>Closed</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="booking">
+    <div class="section-title">
+      <div class="eyebrow">Appointments</div>
+      <h2>Book your appointment</h2>
+      <p>Select a date and one of the available appointment times.</p>
+    </div>
+
+    <div class="booking-wrap">
+      <div>
+        <h3>Available times</h3>
+        <p class="note">Gray times are unavailable. Click an available time to select it.</p>
+
+        <div class="slots" id="slots">
+          <button class="slot" type="button" data-time="10:00 AM">10:00 AM</button>
+          <button class="slot unavailable" type="button" disabled>10:30 AM</button>
+          <button class="slot" type="button" data-time="11:00 AM">11:00 AM</button>
+          <button class="slot" type="button" data-time="12:00 PM">12:00 PM</button>
+          <button class="slot unavailable" type="button" disabled>1:00 PM</button>
+          <button class="slot" type="button" data-time="2:00 PM">2:00 PM</button>
+          <button class="slot" type="button" data-time="3:30 PM">3:30 PM</button>
+          <button class="slot" type="button" data-time="4:30 PM">4:30 PM</button>
+          <button class="slot" type="button" data-time="6:00 PM">6:00 PM</button>
+        </div>
+      </div>
+
+      <div>
+        <form id="appointmentForm">
+          <div>
+            <label for="name">Full name</label>
+            <input id="name" name="name" required placeholder="Your name">
+          </div>
+
+          <div>
+            <label for="phone">Phone number</label>
+            <input id="phone" name="phone" type="tel" required placeholder="(312) 555-0123">
+          </div>
+
+          <div>
+            <label for="email">Email (optional)</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com">
+          </div>
+
+          <div>
+            <label for="service">Service</label>
+            <select id="service" name="service" required>
+              <option value="">Choose a service</option>
+              <option>Men's Haircut - $30</option>
+              <option>Women's Haircut - $45</option>
+              <option>Hair Color - $75+</option>
+              <option>Beard Trim - $18</option>
+              <option>Wash & Style - $35</option>
+              <option>Kids Haircut - $22</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="stylist">Stylist</label>
+            <select id="stylist" name="stylist">
+              <option>Any available stylist</option>
+              <option>Sophia</option>
+              <option>Daniel</option>
+              <option>Maya</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="date">Appointment date</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+
+          <input type="hidden" id="time" name="time">
+
+          <button class="btn" type="submit">Book Appointment</button>
+
+          <div class="confirmation" id="confirmation"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 2026 Luxe Hair Studio. All rights reserved.
+</footer>
+
+<script>
+  const TIMES = ["10:00 AM","10:30 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:30 PM","4:30 PM","6:00 PM"];
+  const slotsBox = document.getElementById("slots");
+  const timeInput = document.getElementById("time");
+  const dateInput = document.getElementById("date");
+  const form = document.getElementById("appointmentForm");
+  const confirmation = document.getElementById("confirmation");
+
+  const today = new Date();
+  dateInput.min = today.toISOString().slice(0,10);
+  dateInput.value = dateInput.min;
+
+  async function loadAvailability() {
+    const date = dateInput.value;
+    if (!date) return;
+    const response = await fetch(`/api/availability?date=${encodeURIComponent(date)}`);
+    const data = await response.json();
+    const booked = new Set(data.booked || []);
+    slotsBox.innerHTML = "";
+    timeInput.value = "";
+
+    TIMES.forEach(time => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "slot";
+      button.textContent = booked.has(time) ? `${time} — Booked` : `${time} — Available`;
+      if (booked.has(time)) {
+        button.disabled = true;
+        button.classList.add("unavailable");
+      } else {
+        button.dataset.time = time;
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".slot").forEach(s => s.classList.remove("selected"));
+          button.classList.add("selected");
+          timeInput.value = time;
+        });
+      }
+      slotsBox.appendChild(button);
+    });
+  }
+
+  dateInput.addEventListener("change", loadAvailability);
+  loadAvailability();
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!timeInput.value) {
+      alert("Please choose an available appointment time.");
+      return;
+    }
+
+    const payload = {
+      name: document.getElementById("name").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      service: document.getElementById("service").value,
+      stylist: document.getElementById("stylist").value,
+      date: dateInput.value,
+      time: timeInput.value
+    };
+
+    const response = await fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.error || 'Could not book appointment.');
+      await loadAvailability();
+      return;
+    }
+
+    confirmation.style.display = 'block';
+    confirmation.textContent = `Appointment booked for ${payload.date} at ${payload.time}.`;
+    form.reset();
+    dateInput.value = dateInput.min;
+    await loadAvailability();
+  });
+</script>
+
+</body>
+</html>
