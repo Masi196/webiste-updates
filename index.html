@@ -450,14 +450,7 @@
       </div>
 
       <div>
-        <iframe name="bookingTarget" id="bookingTarget" style="display:none"></iframe>
-        <form id="appointmentForm"
-              action="https://formsubmit.co/masiha4080@gmail.com"
-              method="POST"
-              target="bookingTarget">
-          <input type="hidden" name="_subject" value="New Hair Salon Appointment">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_template" value="table">
+        <form id="appointmentForm">
           <div>
             <label for="name">Full name</label>
             <input id="name" name="name" required placeholder="Your name">
@@ -466,6 +459,11 @@
           <div>
             <label for="phone">Phone number</label>
             <input id="phone" name="phone" type="tel" required placeholder="+1 847-296-7788">
+          </div>
+
+          <div>
+            <label for="email">Email (optional)</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com">
           </div>
 
           <div>
@@ -512,47 +510,84 @@
 </footer>
 
 <script>
-  const slots = document.querySelectorAll(".slot:not(.unavailable)");
+  const TIMES = ["10:00 AM","10:30 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:30 PM","4:30 PM","6:00 PM"];
+  const slotsBox = document.getElementById("slots");
   const timeInput = document.getElementById("time");
   const dateInput = document.getElementById("date");
   const form = document.getElementById("appointmentForm");
   const confirmation = document.getElementById("confirmation");
 
   const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  dateInput.min = `${yyyy}-${mm}-${dd}`;
+  dateInput.min = today.toISOString().slice(0,10);
+  dateInput.value = dateInput.min;
 
-  slots.forEach(slot => {
-    slot.addEventListener("click", () => {
-      slots.forEach(s => s.classList.remove("selected"));
-      slot.classList.add("selected");
-      timeInput.value = slot.dataset.time;
+  async function loadAvailability() {
+    const date = dateInput.value;
+    if (!date) return;
+    const response = await fetch(`/api/availability?date=${encodeURIComponent(date)}`);
+    const data = await response.json();
+    const booked = new Set(data.booked || []);
+    slotsBox.innerHTML = "";
+    timeInput.value = "";
+
+    TIMES.forEach(time => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "slot";
+      button.textContent = booked.has(time) ? `${time} — Booked` : `${time} — Available`;
+      if (booked.has(time)) {
+        button.disabled = true;
+        button.classList.add("unavailable");
+      } else {
+        button.dataset.time = time;
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".slot").forEach(s => s.classList.remove("selected"));
+          button.classList.add("selected");
+          timeInput.value = time;
+        });
+      }
+      slotsBox.appendChild(button);
     });
-  });
+  }
 
-  form.addEventListener("submit", function(e) {
+  dateInput.addEventListener("change", loadAvailability);
+  loadAvailability();
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
     if (!timeInput.value) {
-      e.preventDefault();
       alert("Please choose an available appointment time.");
       return;
     }
 
-    const name = document.getElementById("name").value.trim();
-    const service = document.getElementById("service").value;
-    const stylist = document.getElementById("stylist").value;
-    const date = dateInput.value;
-    const time = timeInput.value;
+    const payload = {
+      name: document.getElementById("name").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      service: document.getElementById("service").value,
+      stylist: document.getElementById("stylist").value,
+      date: dateInput.value,
+      time: timeInput.value
+    };
 
-    // The form is submitted to FormSubmit in the hidden iframe.
-    // FormSubmit forwards the booking details to the salon owner's email.
-    setTimeout(() => {
-      confirmation.style.display = "block";
-      confirmation.textContent =
-        `Appointment request sent for ${name}: ${service}, ${date} at ${time}, with ${stylist}.`;
-      form.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 400);
+    const response = await fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.error || 'Could not book appointment.');
+      await loadAvailability();
+      return;
+    }
+
+    confirmation.style.display = 'block';
+    confirmation.textContent = `Appointment booked for ${payload.date} at ${payload.time}.`;
+    form.reset();
+    dateInput.value = dateInput.min;
+    await loadAvailability();
   });
 </script>
 
