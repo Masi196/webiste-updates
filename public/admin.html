@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Salon Admin</title>
+<style>
+body{font-family:Arial,sans-serif;background:#fffaf7;color:#1f1b1a;margin:0}.wrap{max-width:1100px;margin:auto;padding:40px 20px}h1{margin-bottom:8px}.card{background:#fff;border:1px solid #eaded8;border-radius:18px;padding:22px;margin-top:20px}.row{display:flex;gap:10px;flex-wrap:wrap}input,button{padding:12px;border-radius:10px;border:1px solid #d8cbc5;font:inherit}button{cursor:pointer;background:#b76e79;color:white;border:0;font-weight:700}.danger{background:#8d3030}.muted{color:#6f6460}.hidden{display:none}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{text-align:left;padding:11px;border-bottom:1px solid #eee;vertical-align:top}th{font-size:.85rem;color:#6f6460}@media(max-width:760px){table,thead,tbody,tr,th,td{display:block}thead{display:none}tr{border-bottom:2px solid #ddd;padding:10px 0}td{border:0;padding:4px 0}td:before{content:attr(data-label) ': ';font-weight:bold}}
+</style>
+</head>
+<body><div class="wrap">
+<h1>Salon Owner Dashboard</h1><p class="muted">Customer details are only shown here after admin login.</p>
+<div id="loginCard" class="card"><h2>Admin login</h2><div class="row"><input id="password" type="password" placeholder="Admin password"><button id="loginBtn">Log in</button></div><p id="loginError" class="muted"></p></div>
+<div id="dashboard" class="hidden">
+  <div class="row"><button id="refreshBtn">Refresh appointments</button><button id="logoutBtn">Log out</button></div>
+
+  <div class="card">
+    <h2>Active Appointments</h2>
+    <p class="muted">Today and future bookings. After the date ends, they automatically move to History.</p>
+    <div id="activeEmpty" class="muted"></div>
+    <div style="overflow:auto"><table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Email</th><th>Service</th><th>Stylist</th><th></th></tr></thead><tbody id="activeAppointments"></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h2>Appointment History</h2>
+    <p class="muted">Past appointments that were not canceled.</p>
+    <div id="historyEmpty" class="muted"></div>
+    <div style="overflow:auto"><table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Email</th><th>Service</th><th>Stylist</th></tr></thead><tbody id="historyAppointments"></tbody></table></div>
+  </div>
+</div>
+</div>
+<script>
+const loginCard=document.getElementById('loginCard');
+const dashboard=document.getElementById('dashboard');
+const activeBody=document.getElementById('activeAppointments');
+const historyBody=document.getElementById('historyAppointments');
+const activeEmpty=document.getElementById('activeEmpty');
+const historyEmpty=document.getElementById('historyEmpty');
+
+async function status(){
+  const r=await fetch('/api/admin/status');
+  const d=await r.json();
+  d.loggedIn?showDashboard():showLogin();
+}
+function showLogin(){loginCard.classList.remove('hidden');dashboard.classList.add('hidden')}
+async function showDashboard(){loginCard.classList.add('hidden');dashboard.classList.remove('hidden');await loadAppointments()}
+
+function appendCells(tr,a){
+  const vals=[['Date',a.date],['Time',a.time],['Name',a.name],['Phone',a.phone],['Email',a.email||'—'],['Service',a.service],['Stylist',a.stylist]];
+  vals.forEach(([label,val])=>{const td=document.createElement('td');td.dataset.label=label;td.textContent=val;tr.appendChild(td)});
+}
+
+async function loadAppointments(){
+  const r=await fetch('/api/admin/appointments');
+  if(r.status===401)return showLogin();
+  const data=await r.json();
+  const active=data.active||[];
+  const history=data.history||[];
+
+  activeBody.innerHTML='';
+  historyBody.innerHTML='';
+  activeEmpty.textContent=active.length?'':'No active appointments.';
+  historyEmpty.textContent=history.length?'':'No appointment history yet.';
+
+  active.forEach(a=>{
+    const tr=document.createElement('tr');
+    appendCells(tr,a);
+    const td=document.createElement('td');
+    td.dataset.label='Action';
+    const b=document.createElement('button');
+    b.textContent='Cancel';b.className='danger';
+    b.onclick=async()=>{if(confirm('Cancel this appointment? It will not be kept in history.')){await fetch('/api/admin/appointments/'+a.id,{method:'DELETE'});loadAppointments()}};
+    td.appendChild(b);tr.appendChild(td);activeBody.appendChild(tr);
+  });
+
+  history.forEach(a=>{
+    const tr=document.createElement('tr');
+    appendCells(tr,a);
+    historyBody.appendChild(tr);
+  });
+}
+
+document.getElementById('loginBtn').onclick=async()=>{const password=document.getElementById('password').value;const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});if(r.ok){document.getElementById('loginError').textContent='';showDashboard()}else document.getElementById('loginError').textContent='Incorrect password.'};
+document.getElementById('refreshBtn').onclick=loadAppointments;
+document.getElementById('logoutBtn').onclick=async()=>{await fetch('/api/admin/logout',{method:'POST'});showLogin()};
+status();
+</script></body></html>
